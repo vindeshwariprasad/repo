@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html ng-app="userApp">
+  <head>
+    <meta charset="utf-8" />
+    <title>User Management App</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+  </head>
+
+  <body ng-controller="UserController">
+    <div class="container">
+      <h2>User Management</h2>
+
+      <!-- Search Box -->
+      <input type="text" ng-model="searchText" placeholder="Search by Name" />
+
+      <!-- Filters -->
+      <label>Domain:</label>
+      <select
+        ng-model="selectedDomain"
+        ng-options="domain for domain in domains"
+      >
+        <option value="">All</option>
+      </select>
+
+      <label>Gender:</label>
+      <select
+        ng-model="selectedGender"
+        ng-options="gender for gender in genders"
+      >
+        <option value="">All</option>
+      </select>
+
+      <label>Availability:</label>
+
+      <select ng-model="selectedAvailability">
+        <option value="">All</option>
+        <option value="true">Available</option>
+        <option value="false">Not Available</option>
+      </select>
+
+      <!-- Users Pagination -->
+      <ul>
+        <li
+          ng-repeat="user in filteredUsers = (users | filter:searchText | filter:filterByDomain | filter:filterByGender | filter:filterByAvailability) | startFrom:(currentPage-1)*pageSize | limitTo:pageSize"
+        >
+          <!-- Display User Card -->
+          <div class="user-card">
+            <img ng-src="{{user.avatar}}" alt="{{user.first_name}}" />
+            <p>{{user.first_name}} {{user.last_name}}</p>
+            <p>{{user.email}}</p>
+            <p>{{user.domain}}</p>
+            <p>{{user.gender}}</p>
+            <p>{{user.available ? 'Available' : 'Not Available'}}</p>
+            <button
+              ng-click="addToTeam(user)"
+              ng-disabled="!user.available || teamDomains.indexOf(user.domain) !== -1"
+            >
+              Add to Team
+            </button>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Pagination Controls -->
+      <div>
+        <button
+          ng-disabled="currentPage == 1"
+          ng-click="currentPage = currentPage - 1"
+        >
+          Previous
+        </button>
+        <button
+          ng-disabled="currentPage >= filteredUsers.length/pageSize"
+          ng-click="currentPage = currentPage + 1"
+        >
+          Next
+        </button>
+      </div>
+
+      <!-- Team Section -->
+      <div ng-show="team.length > 0">
+        <h3>Team Details</h3>
+        <ul>
+          <li ng-repeat="teamMember in team">
+            <p>
+              {{teamMember.first_name}} {{teamMember.last_name}} -
+              {{teamMember.domain}}
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
